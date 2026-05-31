@@ -102,6 +102,24 @@ describe("CreateForm", () => {
     expect(screen.getByRole("button", { name: "生成图片" })).toBeEnabled();
   });
 
+  test("shows Bailian generic copy when an API failure is not JSON", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: async () => {
+        throw new Error("not json");
+      }
+    }));
+
+    render(<CreateForm locale="en" credits={2} />);
+
+    fireEvent.change(screen.getByRole("textbox", { name: "Subject, for example: an orange cat in an astronaut suit outside a moon cafe" }), { target: { value: "A red espresso machine" } });
+    fireEvent.click(screen.getByRole("button", { name: "Generate image" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Bailian");
+    expect(screen.getByRole("button", { name: "Generate image" })).toBeEnabled();
+  });
+
   test("shows the generated image when the API returns an image URL", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
       ok: true,
