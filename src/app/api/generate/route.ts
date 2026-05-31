@@ -3,11 +3,23 @@ import { reserveGenerationCredit, refundGenerationCredit } from "@/lib/credits";
 import { getEnv } from "@/lib/env";
 import { generationFailurePayload, messageFromUnknownError } from "@/lib/generation-errors";
 import { parseGenerateForm } from "@/lib/generate-form";
-import { createOpenAIClient, generateImage } from "@/lib/openai-images";
+import { createBailianClient, generateImage } from "@/lib/bailian-images";
 import { buildPrompt } from "@/lib/prompt-builder";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { buildStoragePath, uploadPrivateFile } from "@/lib/storage";
+
+async function createSignedReferenceUrl(
+  admin: ReturnType<typeof createSupabaseAdminClient>,
+  path: string
+) {
+  const signed = await admin.storage.from("reference-images").createSignedUrl(path, 60 * 10);
+  if (signed.error || !signed.data?.signedUrl) {
+    throw new Error(signed.error?.message ?? "Failed to create signed reference URL");
+  }
+
+  return signed.data.signedUrl;
+}
 
 export async function POST(request: Request) {
   const supabase = await createSupabaseServerClient();
@@ -59,18 +71,20 @@ export async function POST(request: Request) {
 
   try {
     let referencePath: string | undefined;
+    let referenceImageUrl: string | undefined;
     if (parsed.referenceImage) {
       referencePath = buildStoragePath(user.id, generationId, parsed.referenceImage.name);
       await uploadPrivateFile(admin, "reference-images", referencePath, parsed.referenceImage, parsed.referenceImage.type);
+      referenceImageUrl = await createSignedReferenceUrl(admin, referencePath);
     }
 
-    const openai = createOpenAIClient(env.OPENAI_API_KEY);
+    const bailian = createBailianClient(env.BAILIAN_API_KEY, env.BAILIAN_API_BASE_URL);
     const imageBytes = await generateImage({
-      client: openai,
-      model: env.OPENAI_IMAGE_MODEL,
+      client: bailian,
+      model: env.BAILIAN_IMAGE_MODEL,
       prompt: prompt.submittedPrompt,
       aspectRatio: parsed.aspectRatio ?? "1:1",
-      referenceImage: parsed.referenceImage
+      referenceImageUrl
     });
 
     const generatedPath = buildStoragePath(user.id, generationId, "generated.png");
