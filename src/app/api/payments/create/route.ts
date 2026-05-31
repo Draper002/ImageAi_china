@@ -85,17 +85,19 @@ export async function POST(request: Request) {
       qrCodeUrl: payment.qrCodeUrl
     });
   } catch (error) {
+    const message = error instanceof Error ? error.message : "Unable to start Alipay payment";
+
     await admin
       .from("payment_orders")
       .update({
         status: "failed",
         raw_create_response: {
-          error: error instanceof Error ? error.message : "Unknown Alipay error"
+          error: message
         },
         updated_at: new Date().toISOString()
       })
       .eq("id", order.id);
 
-    return NextResponse.json({ error: "Unable to start Alipay payment" }, { status: 502 });
+    return NextResponse.json({ error: message }, { status: 502 });
   }
 }

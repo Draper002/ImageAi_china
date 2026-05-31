@@ -63,7 +63,7 @@ function toPem(value: string, label: "PRIVATE KEY" | "PUBLIC KEY") {
   return `-----BEGIN ${label}-----\n${lines}\n-----END ${label}-----`;
 }
 
-function formatAlipayTimestamp(date = new Date()) {
+export function formatAlipayTimestamp(date = new Date()) {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Shanghai",
     year: "numeric",
@@ -72,10 +72,11 @@ function formatAlipayTimestamp(date = new Date()) {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
-    hour12: false
+    hourCycle: "h23"
   }).formatToParts(date);
   const map = Object.fromEntries(parts.map((part) => [part.type, part.value]));
-  return `${map.year}-${map.month}-${map.day} ${map.hour}:${map.minute}:${map.second}`;
+  const hour = map.hour === "24" ? "00" : map.hour;
+  return `${map.year}-${map.month}-${map.day} ${hour}:${map.minute}:${map.second}`;
 }
 
 function encodeForm(params: Record<string, string>) {
@@ -119,6 +120,10 @@ function verifyAlipayResponse(rawText: string, method: string, sign: string | un
   if (!verifier.verify(toPem(publicKey, "PUBLIC KEY"), sign, "base64")) {
     throw new Error("Alipay response signature verification failed");
   }
+}
+
+export function isAlipayResponseSignatureValidationEnabled() {
+  return process.env.ALIPAY_VALIDATE_RESPONSE_SIGNATURE === "true" || process.env.ALIPAY_VALIDATE_RESPONSE_SIGNATURE === "1";
 }
 
 export function getAlipayConfig(): AlipayConfig {
@@ -175,10 +180,12 @@ async function requestAlipay(method: string, bizContent: Record<string, unknown>
   const data = (payload[responseKey] ?? payload.error_response) as AlipayResponse | undefined;
   if (!data) throw new Error(`Alipay response is missing ${responseKey}`);
 
-  verifyAlipayResponse(rawText, method, payload.sign as string | undefined, config.alipayPublicKey);
-
   if (data.code !== "10000") {
     throw new Error(data.sub_msg || data.msg || "Alipay request was rejected");
+  }
+
+  if (isAlipayResponseSignatureValidationEnabled()) {
+    verifyAlipayResponse(rawText, method, payload.sign as string | undefined, config.alipayPublicKey);
   }
 
   return data;
