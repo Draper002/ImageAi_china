@@ -77,7 +77,7 @@ function AccountDashboard({ stats }: { stats: AccountStats }) {
             <div>
               <Badge variant="accent">Dashboard</Badge>
               <h1 className="mt-3 text-4xl font-semibold tracking-[-0.055em] text-zinc-950 md:text-5xl">账户概览</h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-600">查看当前积分、生成状态和账户入口。支付和订阅能力仍是预留展示。</p>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-600">查看当前积分、生成状态和账户入口。积分可通过支付宝充值到账。</p>
             </div>
             <div className="header-actions">
               <LanguageSwitch locale={stats.locale} path="/account" />
@@ -125,7 +125,7 @@ function AccountDashboard({ stats }: { stats: AccountStats }) {
 
           <article className="rounded-[1.8rem] bg-zinc-950 p-6 text-white shadow-[0_28px_80px_-58px_rgba(24,24,27,0.9)]">
             <h2 className="text-2xl font-semibold tracking-tight">充值入口</h2>
-            <p className="mt-3 text-sm leading-6 text-zinc-300">按量充值和月度方案已作为前端入口展示，后续接入真实支付后可复用这块区域。</p>
+            <p className="mt-3 text-sm leading-6 text-zinc-300">选择套餐后生成支付宝付款码，支付确认后积分会自动增加。</p>
             <RechargeButton className="button primary mt-6 w-full" locale={stats.locale} />
           </article>
         </section>

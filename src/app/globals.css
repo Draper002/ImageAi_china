@@ -826,7 +826,7 @@ textarea {
 
 .recharge-options {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.75rem;
   margin-top: 1rem;
 }
@@ -879,6 +879,23 @@ textarea {
   margin: 0.7rem 0 0;
   color: #047857;
   font-weight: 750;
+}
+
+.recharge-status {
+  margin-top: 0.9rem;
+  border-top: 1px solid #e4e4e7;
+  padding-top: 0.9rem;
+}
+
+.recharge-qr {
+  width: min(12rem, 100%);
+  aspect-ratio: 1;
+  margin-top: 0.8rem;
+  border: 1px solid #e4e4e7;
+  border-radius: 1rem;
+  background: #fff;
+  object-fit: contain;
+  padding: 0.5rem;
 }
 
 .account-menu {

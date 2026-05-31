@@ -13,7 +13,7 @@ export default function UpgradePage() {
             <div>
               <Badge variant="accent">Credits</Badge>
               <h1 className="mt-3 text-4xl font-semibold tracking-[-0.055em] text-zinc-950 md:text-5xl">充值积分</h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-600">真实支付将在后续版本接入，第一版先保留充值入口和方案展示。</p>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-600">选择积分套餐后生成支付宝付款码，支付确认后自动入账。</p>
             </div>
             <div className="header-actions">
               <LanguageSwitch locale="zh" path="/upgrade" />
@@ -23,8 +23,8 @@ export default function UpgradePage() {
         </header>
         <section className="mt-5 rounded-[2rem] bg-zinc-950 p-6 text-white md:p-10">
           <p className="text-sm font-semibold text-emerald-300">PromptCanvas credits</p>
-          <h2 className="mt-3 max-w-2xl text-4xl font-semibold tracking-[-0.055em]">按量购买或选择月度方案</h2>
-          <p className="mt-4 max-w-xl text-sm leading-6 text-zinc-300">当前版本不会发起真实支付。点击按钮可预览方案弹窗。</p>
+          <h2 className="mt-3 max-w-2xl text-4xl font-semibold tracking-[-0.055em]">按量购买图片生成积分</h2>
+          <p className="mt-4 max-w-xl text-sm leading-6 text-zinc-300">当前接入支付宝智易收个人收款，套餐金额控制在 50 元以内。</p>
           <RechargeButton className="button primary mt-6" locale="zh" />
         </section>
       </div>

@@ -16,7 +16,7 @@ npm.cmd install --cache .npm-cache
 copy docs\env.example .env.local
 ```
 
-3. 填写 `.env.local` 中的 Supabase 和 Bailian 配置。
+3. 填写 `.env.local` 中的 Supabase、Bailian 和 Alipay 配置。
 
 4. 启动开发服务器：
 
@@ -42,6 +42,7 @@ supabase db push
 
 ```text
 supabase/migrations/001_initial_schema.sql
+supabase/migrations/002_payment_orders.sql
 ```
 
 ## 验证
@@ -54,7 +55,7 @@ npm.cmd run build
 
 ## MVP 限制
 
-- 第一版不接真实支付。
+- 支付第一版接入支付宝智易收个人收款，采用“创建订单 + 主动查询确认”的积分充值闭环。
 - 第一版不做邮箱验证、找回密码或邮件通知。
 - 每次生成最多支持 1 张可选参考图。
 - 图片生成当前是同步请求；如果生成耗时明显，再加入队列和任务状态面板。
