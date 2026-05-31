@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { reserveGenerationCredit, refundGenerationCredit } from "@/lib/credits";
 import { getEnv } from "@/lib/env";
-import { generationFailurePayload, messageFromUnknownError } from "@/lib/generation-errors";
+import { generationFailurePayload } from "@/lib/generation-errors";
 import { parseGenerateForm } from "@/lib/generate-form";
 import { createBailianClient, generateImage } from "@/lib/bailian-images";
 import { buildPrompt } from "@/lib/prompt-builder";
@@ -112,7 +112,7 @@ export async function POST(request: Request) {
     await refundGenerationCredit(admin, user.id, generationId);
     await admin.from("generations").update({
       status: "failed",
-      error_message: messageFromUnknownError(error),
+      error_message: failure.error,
       updated_at: new Date().toISOString()
     }).eq("id", generationId);
 

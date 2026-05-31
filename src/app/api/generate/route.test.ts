@@ -175,4 +175,29 @@ describe("POST /api/generate", () => {
     expect(response.status).toBe(500);
     expect(mocks.refundGenerationCredit).toHaveBeenCalledWith(admin.client, "user-1", "generation-1");
   });
+
+  test("stores sanitized Bailian failure instead of raw signed URL provider details", async () => {
+    const admin = createAdminClient();
+    mocks.createSupabaseAdminClient.mockReturnValue(admin.client);
+    mocks.generateImage.mockRejectedValue(new Error(
+      "reference image signed url is not accessible: https://storage.example.com/ref.png?token=secret-token"
+    ));
+    const form = new FormData();
+    form.set("subject", "iced coffee");
+
+    const response = await POST(createRequest(form));
+
+    expect(response.status).toBe(500);
+    await expect(response.json()).resolves.toEqual({
+      code: "bailian_image_url_error",
+      error: "百炼无法访问参考图链接，请确认参考图 signed URL 可被服务端访问。"
+    });
+    expect(admin.update).toHaveBeenLastCalledWith(expect.objectContaining({
+      status: "failed",
+      error_message: "百炼无法访问参考图链接，请确认参考图 signed URL 可被服务端访问。"
+    }));
+    expect(admin.update).not.toHaveBeenCalledWith(expect.objectContaining({
+      error_message: expect.stringContaining("secret-token")
+    }));
+  });
 });

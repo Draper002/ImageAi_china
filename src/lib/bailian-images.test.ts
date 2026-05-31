@@ -3,6 +3,7 @@ import { describe, expect, test, vi } from "vitest";
 import {
   BAILIAN_IMAGE_ENDPOINT,
   buildBailianRequest,
+  createBailianClient,
   extractImageUrl,
   generateImage,
   sizeForAspectRatio
@@ -24,15 +25,15 @@ describe("sizeForAspectRatio", () => {
 describe("buildBailianRequest", () => {
   test("builds a text-only request with thinking mode", () => {
     expect(buildBailianRequest({
-      model: "wanx2.1-imageedit",
-      prompt: "生成一张城市夜景图",
+      model: "wan2.7-image-pro",
+      prompt: "Generate a city night scene",
       aspectRatio: "16:9"
     })).toEqual({
-      model: "wanx2.1-imageedit",
+      model: "wan2.7-image-pro",
       input: {
         messages: [{
           role: "user",
-          content: [{ text: "生成一张城市夜景图" }]
+          content: [{ text: "Generate a city night scene" }]
         }]
       },
       parameters: {
@@ -46,12 +47,12 @@ describe("buildBailianRequest", () => {
 
   test("builds a reference-image request without thinking mode", () => {
     expect(buildBailianRequest({
-      model: "wanx2.1-imageedit",
+      model: "wan2.7-image-pro",
       prompt: "Use this composition",
       aspectRatio: "4:5",
       referenceImageUrl: "https://example.test/reference.png"
     })).toEqual({
-      model: "wanx2.1-imageedit",
+      model: "wan2.7-image-pro",
       input: {
         messages: [{
           role: "user",
@@ -126,7 +127,7 @@ describe("generateImage", () => {
         baseUrl: "https://dashscope.example/api/v1",
         fetch
       },
-      model: "wanx2.1-imageedit",
+      model: "wan2.7-image-pro",
       prompt: "Create an image",
       aspectRatio: "1:1"
     });
@@ -138,13 +139,45 @@ describe("generateImage", () => {
         "content-type": "application/json"
       },
       body: JSON.stringify(buildBailianRequest({
-        model: "wanx2.1-imageedit",
+        model: "wan2.7-image-pro",
         prompt: "Create an image",
         aspectRatio: "1:1"
       }))
     });
     expect(fetch).toHaveBeenNthCalledWith(2, "https://example.test/result.png");
     expect(result).toEqual(imageBytes);
+  });
+
+  test("normalizes trailing slash in the Bailian base URL", async () => {
+    const fetch = vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        output: {
+          choices: [{
+            message: {
+              content: [{ image: "https://example.test/result.png" }]
+            }
+          }]
+        }
+      }), {
+        status: 200,
+        headers: { "content-type": "application/json" }
+      }))
+      .mockResolvedValueOnce(new Response(Buffer.from("image-bytes"), {
+        status: 200,
+        headers: { "content-type": "image/png" }
+      }));
+
+    await generateImage({
+      client: {
+        ...createBailianClient("test-key", "https://dashscope.example/api/v1/"),
+        fetch
+      },
+      model: "wan2.7-image-pro",
+      prompt: "Create an image",
+      aspectRatio: "1:1"
+    });
+
+    expect(fetch.mock.calls[0][0]).toBe(`https://dashscope.example/api/v1${BAILIAN_IMAGE_ENDPOINT}`);
   });
 
   test("throws when Bailian does not return an image URL", async () => {
@@ -167,9 +200,49 @@ describe("generateImage", () => {
         baseUrl: "https://dashscope.example/api/v1",
         fetch
       },
-      model: "wanx2.1-imageedit",
+      model: "wan2.7-image-pro",
       prompt: "Create an image",
       aspectRatio: "1:1"
     })).rejects.toThrow("Bailian did not return an image URL.");
+  });
+
+  test("throws safe status text for non-JSON HTTP failures", async () => {
+    const fetch = vi.fn().mockResolvedValue(new Response("upstream unavailable token=secret", {
+      status: 503,
+      statusText: "Service Unavailable",
+      headers: { "content-type": "text/plain" }
+    }));
+
+    await expect(generateImage({
+      client: {
+        apiKey: "test-key",
+        baseUrl: "https://dashscope.example/api/v1",
+        fetch
+      },
+      model: "wan2.7-image-pro",
+      prompt: "Create an image",
+      aspectRatio: "1:1"
+    })).rejects.toThrow("Bailian request failed with status 503 Service Unavailable");
+  });
+
+  test("throws clean Bailian code and message for JSON failures", async () => {
+    const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      code: "InvalidApiKey",
+      message: "Invalid API-key provided."
+    }), {
+      status: 401,
+      headers: { "content-type": "application/json" }
+    }));
+
+    await expect(generateImage({
+      client: {
+        apiKey: "test-key",
+        baseUrl: "https://dashscope.example/api/v1",
+        fetch
+      },
+      model: "wan2.7-image-pro",
+      prompt: "Create an image",
+      aspectRatio: "1:1"
+    })).rejects.toThrow("Bailian request failed with status 401 code InvalidApiKey: Invalid API-key provided.");
   });
 });

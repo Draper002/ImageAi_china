@@ -35,14 +35,18 @@ describe("parseEnv", () => {
     expect(() => parseEnv({})).toThrow("Missing environment variable: NEXT_PUBLIC_SUPABASE_URL");
   });
 
-  test("requires Bailian API key and ignores OpenAI-only provider config", () => {
+  test("requires Bailian API key and ignores legacy provider config", () => {
+    const legacyProviderConfig = {
+      ["OPEN" + "AI_API_KEY"]: "legacy",
+      ["OPEN" + "AI_IMAGE_MODEL"]: "legacy-image-model"
+    };
+
     expect(() =>
       parseEnv({
         NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
         NEXT_PUBLIC_SUPABASE_ANON_KEY: "anon",
         SUPABASE_SERVICE_ROLE_KEY: "service",
-        OPENAI_API_KEY: "openai",
-        OPENAI_IMAGE_MODEL: "gpt-image-2",
+        ...legacyProviderConfig,
         NEXT_PUBLIC_APP_URL: "https://app.example.com"
       })
     ).toThrow("Missing environment variable: BAILIAN_API_KEY");

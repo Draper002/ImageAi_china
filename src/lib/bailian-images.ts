@@ -109,7 +109,7 @@ export async function generateImage({
   referenceImageUrl
 }: GenerateImageInput) {
   const request = buildBailianRequest({ model, prompt, aspectRatio, referenceImageUrl });
-  const response = await client.fetch(`${client.baseUrl}${BAILIAN_IMAGE_ENDPOINT}`, {
+  const response = await client.fetch(`${normalizeBaseUrl(client.baseUrl)}${BAILIAN_IMAGE_ENDPOINT}`, {
     method: "POST",
     headers: {
       authorization: `Bearer ${client.apiKey}`,
@@ -117,10 +117,11 @@ export async function generateImage({
     },
     body: JSON.stringify(request)
   });
-  const payload: unknown = await response.json();
+  const responseText = await response.text();
+  const payload = parseJsonResponse(responseText);
 
   if (!response.ok || hasBailianCode(payload)) {
-    throw new Error(getBailianMessage(payload) ?? `Bailian request failed with status ${response.status}`);
+    throw new Error(formatBailianError(response, payload));
   }
 
   const imageUrl = extractImageUrl(payload);
@@ -147,9 +148,25 @@ export function createBailianClient(
 ): BailianClient {
   return {
     apiKey,
-    baseUrl,
+    baseUrl: normalizeBaseUrl(baseUrl),
     fetch
   };
+}
+
+function normalizeBaseUrl(baseUrl: string) {
+  return baseUrl.replace(/\/+$/, "");
+}
+
+function parseJsonResponse(text: string): unknown {
+  if (!text) {
+    return undefined;
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return undefined;
+  }
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -160,6 +177,22 @@ function hasBailianCode(payload: unknown) {
   return isRecord(payload) && typeof payload.code === "string" && payload.code.length > 0;
 }
 
-function getBailianMessage(payload: unknown) {
-  return isRecord(payload) && typeof payload.message === "string" ? payload.message : undefined;
+function formatBailianError(response: Response, payload: unknown) {
+  const status = `status ${response.status}${response.statusText ? ` ${response.statusText}` : ""}`;
+  const code = isRecord(payload) && typeof payload.code === "string" ? payload.code : undefined;
+  const message = isRecord(payload) && typeof payload.message === "string" ? payload.message : undefined;
+
+  if (code && message) {
+    return `Bailian request failed with ${status} code ${code}: ${message}`;
+  }
+
+  if (code) {
+    return `Bailian request failed with ${status} code ${code}`;
+  }
+
+  if (message) {
+    return `Bailian request failed with ${status}: ${message}`;
+  }
+
+  return `Bailian request failed with ${status}`;
 }
