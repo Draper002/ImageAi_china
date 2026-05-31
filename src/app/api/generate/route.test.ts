@@ -163,6 +163,26 @@ describe("POST /api/generate", () => {
     );
   });
 
+  test("sanitizes generation record insert failures", async () => {
+    const admin = createAdminClient();
+    mocks.createSupabaseAdminClient.mockReturnValue(admin.client);
+    admin.insert.mockResolvedValue({
+      error: {
+        message: "duplicate key value violates unique constraint generations_secret_idx"
+      }
+    });
+    const form = new FormData();
+    form.set("subject", "iced coffee");
+
+    const response = await POST(createRequest(form));
+
+    expect(response.status).toBe(500);
+    await expect(response.json()).resolves.toEqual({
+      error: "Unable to start generation. Please try again later."
+    });
+    expect(mocks.reserveGenerationCredit).not.toHaveBeenCalled();
+  });
+
   test("refunds credit when Bailian generation fails", async () => {
     const admin = createAdminClient();
     mocks.createSupabaseAdminClient.mockReturnValue(admin.client);

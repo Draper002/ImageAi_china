@@ -60,7 +60,7 @@ export async function POST(request: Request) {
   });
 
   if (insertError) {
-    return NextResponse.json({ error: insertError.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to start generation. Please try again later." }, { status: 500 });
   }
 
   const reserved = await reserveGenerationCredit(admin, user.id, generationId);
