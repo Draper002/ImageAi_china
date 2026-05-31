@@ -1,6 +1,6 @@
 # PromptCanvas
 
-AI 生图 SaaS MVP。用户填写主体，也可以选择图片类型、比例、风格、场景、留白要求和 1 张参考图。系统组装结构化提示词，调用 OpenAI 图片接口生成图片，并用 Supabase 保存账号、积分、历史和私有图片。
+AI 生图 SaaS MVP。用户填写主体，也可以选择图片类型、比例、风格、场景、留白要求和 1 张参考图。系统组装结构化提示词，调用阿里云百炼通义万相 Wan2.7 生成图片，并用 Supabase 保存账号、积分、历史和私有图片。
 
 ## 本地开发
 
@@ -16,7 +16,7 @@ npm.cmd install --cache .npm-cache
 copy docs\env.example .env.local
 ```
 
-3. 填写 `.env.local` 中的 Supabase 和 OpenAI 配置。
+3. 填写 `.env.local` 中的 Supabase 和 Bailian 配置。
 
 4. 启动开发服务器：
 
