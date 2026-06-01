@@ -52,4 +52,20 @@ describe("LoginPage", () => {
     expect(screen.getByRole("link", { name: "返回登录" })).toHaveAttribute("href", "/login");
     expect(screen.getByLabelText("注册邮箱")).toBeInTheDocument();
   });
+
+  test("adds an optional invitation code field to normal signup", async () => {
+    render(await LoginPage({ searchParams: Promise.resolve({ mode: "signup" }) }));
+
+    expect(screen.getByLabelText("邀请码（选填）")).toHaveAttribute("name", "inviteCode");
+    expect(screen.getByLabelText("邀请码（选填）")).not.toHaveAttribute("readOnly");
+  });
+
+  test("locks the invitation code when signup starts from an invite link", async () => {
+    render(await LoginPage({ searchParams: Promise.resolve({ invite: "INV-8K4M2Q" }) }));
+
+    expect(screen.getByRole("button", { name: "创建账号" })).toBeInTheDocument();
+    expect(screen.getByLabelText("邀请码（选填）")).toHaveValue("INV-8K4M2Q");
+    expect(screen.getByLabelText("邀请码（选填）")).toHaveAttribute("readOnly");
+    expect(screen.getByText("通过邀请链接进入时，这里会自动带入邀请码并锁定。")).toBeInTheDocument();
+  });
 });

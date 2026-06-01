@@ -108,6 +108,7 @@ textarea {
 
 .button:active,
 .account-action:active,
+.side-nav-button:active,
 .chip:active,
 .ratio-option:active {
   transform: translateY(1px) scale(0.99);
@@ -163,6 +164,24 @@ textarea {
 
 .full-width {
   width: 100%;
+}
+
+.create-sidebar nav a,
+.create-sidebar .side-nav-button {
+  cursor: pointer;
+}
+
+.create-sidebar .side-nav-button {
+  justify-content: flex-start;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+}
+
+.create-sidebar nav svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
 }
 
 .field-label {
@@ -1032,6 +1051,7 @@ textarea {
   border-radius: 0.95rem;
   display: flex;
   align-items: center;
+  gap: 0.5rem;
   padding: 0 0.75rem;
   background: transparent;
   color: #3f3f46;

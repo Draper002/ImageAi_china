@@ -52,4 +52,32 @@ describe("signUp", () => {
       password: "secret123"
     });
   });
+
+  test("normalizes and stores the invitation code in app metadata during signup", async () => {
+    const createUser = vi.fn().mockResolvedValue({ data: { user: { id: "user_1" } }, error: null });
+    const signInWithPassword = vi.fn().mockResolvedValue({ error: null });
+
+    mocks.createSupabaseAdminClient.mockReturnValue({
+      auth: { admin: { createUser } }
+    });
+    mocks.createSupabaseServerClient.mockResolvedValue({
+      auth: { signInWithPassword }
+    });
+
+    const formData = new FormData();
+    formData.set("email", "tester@example.com");
+    formData.set("password", "secret123");
+    formData.set("inviteCode", " inv-8k4m2q ");
+
+    await expect(signUp(formData)).rejects.toThrow("NEXT_REDIRECT:/create");
+
+    expect(createUser).toHaveBeenCalledWith({
+      email: "tester@example.com",
+      password: "secret123",
+      email_confirm: true,
+      app_metadata: {
+        invite_code: "INV-8K4M2Q"
+      }
+    });
+  });
 });

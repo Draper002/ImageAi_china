@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { normalizeInviteCode } from "@/lib/invitations";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -39,6 +40,7 @@ export async function signIn(formData: FormData) {
 export async function signUp(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
+  const inviteCode = normalizeInviteCode(formData.get("inviteCode"));
 
   if (!email || password.length < 6) {
     redirect("/login?mode=signup&error=signup-password");
@@ -48,7 +50,8 @@ export async function signUp(formData: FormData) {
   const { error: createError } = await admin.auth.admin.createUser({
     email,
     password,
-    email_confirm: true
+    email_confirm: true,
+    ...(inviteCode ? { app_metadata: { invite_code: inviteCode } } : {})
   });
   if (createError) {
     redirect(signupErrorTarget(createError));

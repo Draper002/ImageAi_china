@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Cross2Icon, DashboardIcon, ExitIcon, ImageIcon, PersonIcon } from "@radix-ui/react-icons";
 import { signOut } from "@/app/account/actions";
 import type { Locale } from "@/lib/presets";
+import { InvitationButton } from "./invitation-dialog";
 import { RechargeButton } from "./recharge-dialog";
 
 type AccountMenuProps = {
@@ -20,6 +21,7 @@ const copy = {
     account: "账户概览",
     create: "生图页面",
     history: "生成历史",
+    invitations: "我的邀请",
     recharge: "充值积分",
     signOut: "退出登录"
   },
@@ -31,6 +33,7 @@ const copy = {
     account: "Account",
     create: "Create page",
     history: "Generation history",
+    invitations: "My invitations",
     recharge: "Recharge credits",
     signOut: "Sign out"
   }
@@ -69,6 +72,7 @@ export function AccountMenu({ credits, email, locale = "zh", placement = "floati
         <Link className="account-action" href={href("/create", locale)}><DashboardIcon className="mr-2 h-4 w-4" />{t.create}</Link>
         <Link className="account-action" href={href("/history", locale)}><ImageIcon className="mr-2 h-4 w-4" />{t.history}</Link>
         <RechargeButton className="account-action" label={t.recharge} locale={locale} />
+        <InvitationButton className="account-action" label={t.invitations} locale={locale} />
         <form action={signOut}>
           <button className="account-action danger" type="submit"><ExitIcon className="mr-2 h-4 w-4" />{t.signOut}</button>
         </form>

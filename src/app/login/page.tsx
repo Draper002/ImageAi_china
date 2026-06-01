@@ -5,10 +5,12 @@ import { SubmitButton } from "@/components/submit-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { normalizeInviteCode } from "@/lib/invitations";
 import { signIn, signUp } from "./actions";
 
 type LoginSearchParams = {
   error?: string | string[];
+  invite?: string | string[];
   mode?: string | string[];
   notice?: string | string[];
 };
@@ -38,9 +40,10 @@ function firstParam(value: string | string[] | undefined) {
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const params = searchParams ? await searchParams : {};
   const errorKey = firstParam(params.error) ?? "";
+  const inviteCode = normalizeInviteCode(firstParam(params.invite));
   const errorMessage = errorMessages[errorKey];
   const noticeMessage = noticeMessages[firstParam(params.notice) ?? ""];
-  const isSignupMode = firstParam(params.mode) === "signup" || signupErrors.has(errorKey);
+  const isSignupMode = Boolean(inviteCode) || firstParam(params.mode) === "signup" || signupErrors.has(errorKey);
 
   return (
     <main id="main-content" className="shell auth-shell px-4">
@@ -111,6 +114,21 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                     autoComplete="new-password"
                     aria-label="注册密码"
                   />
+                </div>
+                <div>
+                  <label className="field-label" htmlFor="signup-invite-code">邀请码（选填）</label>
+                  <Input
+                    id="signup-invite-code"
+                    type="text"
+                    name="inviteCode"
+                    defaultValue={inviteCode}
+                    readOnly={Boolean(inviteCode)}
+                    placeholder="有邀请码可填写，没有可留空"
+                    aria-label="邀请码（选填）"
+                  />
+                  <p className="mt-2 text-xs leading-5 text-zinc-500">
+                    通过邀请链接进入时，这里会自动带入邀请码并锁定。
+                  </p>
                 </div>
                 <SubmitButton className="button primary full-width min-h-12" pendingChildren="创建中...">创建账号</SubmitButton>
               </form>

@@ -3,6 +3,12 @@ import { describe, expect, test } from "vitest";
 import { RechargeButton } from "./recharge-dialog";
 
 describe("RechargeButton", () => {
+  test("renders a leading icon when provided", () => {
+    render(<RechargeButton icon={<span data-testid="recharge-icon" />} />);
+
+    expect(screen.getByRole("button", { name: "充值积分" })).toContainElement(screen.getByTestId("recharge-icon"));
+  });
+
   test("opens a recharge dialog with Alipay credit packs", () => {
     render(<RechargeButton />);
 

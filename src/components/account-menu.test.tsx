@@ -9,6 +9,7 @@ describe("AccountMenu", () => {
     expect(screen.getAllByText("tester@example.com").length).toBeGreaterThan(0);
     expect(screen.getByText("2 积分")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "充值积分" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "我的邀请" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "退出登录" })).toBeInTheDocument();
     expect(container.querySelector(".account-menu")).toHaveClass("account-menu-floating");
     expect(container.querySelector(".account-menu")).not.toHaveClass("account-menu-sidebar");
@@ -26,6 +27,7 @@ describe("AccountMenu", () => {
     expect(screen.getByRole("link", { name: /Create page/ })).toHaveAttribute("href", "/create?locale=en");
     expect(screen.getByRole("link", { name: /Generation history/ })).toHaveAttribute("href", "/history?locale=en");
     expect(screen.getByRole("button", { name: "Recharge credits" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "My invitations" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Sign out" })).toBeInTheDocument();
     expect(container.querySelector(".avatar-close")).toBeInTheDocument();
   });

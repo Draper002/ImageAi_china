@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, it, test } from "vitest";
 import { formatAlipayTimestamp, isAlipayResponseSignatureValidationEnabled, isPaidAlipayTradeStatus } from "./alipay";
 
 const originalValidateSign = process.env.ALIPAY_VALIDATE_RESPONSE_SIGNATURE;

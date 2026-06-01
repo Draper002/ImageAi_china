@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { CheckCircledIcon, Cross2Icon } from "@radix-ui/react-icons";
+import { CheckCircledIcon, Cross2Icon, LightningBoltIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { paymentPlans, type PaymentPlanId } from "@/lib/payment-plans";
 import type { Locale } from "@/lib/presets";
@@ -10,6 +11,7 @@ import { cn } from "@/lib/utils";
 
 type RechargeButtonProps = {
   className?: string;
+  icon?: ReactNode;
   label?: string;
   locale?: Locale;
 };
@@ -84,7 +86,7 @@ const copy = {
   statusFailed: string;
 }>;
 
-export function RechargeButton({ className = "button primary", label, locale = "zh" }: RechargeButtonProps) {
+export function RechargeButton({ className = "button primary", icon, label, locale = "zh" }: RechargeButtonProps) {
   const t = copy[locale];
   const [selectedPlanId, setSelectedPlanId] = useState<PaymentPlanId>("creator");
   const [payment, setPayment] = useState<PaymentResponse | null>(null);
@@ -94,6 +96,7 @@ export function RechargeButton({ className = "button primary", label, locale = "
   const [error, setError] = useState("");
   const selectedPlan = paymentPlans.find((plan) => plan.id === selectedPlanId) ?? paymentPlans[0];
   const isPaid = paymentStatus === "paid";
+  const triggerIcon = icon ?? (className.includes("account-action") ? <LightningBoltIcon className="h-4 w-4" /> : null);
 
   function resetDialogState() {
     setSelectedPlanId("creator");
@@ -164,6 +167,7 @@ export function RechargeButton({ className = "button primary", label, locale = "
     <Dialog.Root onOpenChange={(open) => open && resetDialogState()}>
       <Dialog.Trigger asChild>
         <button className={className} type="button">
+          {triggerIcon ? <span className="inline-flex shrink-0" aria-hidden="true">{triggerIcon}</span> : null}
           {label ?? t.trigger}
         </button>
       </Dialog.Trigger>

@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { DashboardIcon, ImageIcon, LayersIcon } from "@radix-ui/react-icons";
+import { DashboardIcon, ImageIcon, LayersIcon, LightningBoltIcon, Link2Icon } from "@radix-ui/react-icons";
 import { AccountMenu } from "@/components/account-menu";
 import { CreditBadge } from "@/components/credit-badge";
 import { CreateForm } from "@/components/create-form";
+import { InvitationButton } from "@/components/invitation-dialog";
 import { LanguageSwitch } from "@/components/language-switch";
 import { RechargeButton } from "@/components/recharge-dialog";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +34,7 @@ const copy = {
     navCreate: "生成图片",
     navHistory: "历史记录",
     navAccount: "账户概览",
+    navInvitations: "我的邀请",
     statusTitle: "工作台状态",
     statusDescPrimary: "只填写主体也可以生成。",
     statusDescSecondary: "可选项是为了提高稳定性。",
@@ -46,6 +48,7 @@ const copy = {
     navCreate: "Create image",
     navHistory: "History",
     navAccount: "Account",
+    navInvitations: "My invitations",
     statusTitle: "Studio status",
     statusDescPrimary: "The subject alone is enough to generate.",
     statusDescSecondary: "Every option is an optional stabilizer.",
@@ -91,7 +94,17 @@ export default async function CreatePage({ searchParams }: CreatePageProps) {
             <Link className="flex items-center gap-3 rounded-[0.85rem] px-3 py-2 text-sm font-semibold text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-950" href={`/account?locale=${locale}`}>
               <LayersIcon />{t.navAccount}
             </Link>
-            <RechargeButton className="side-nav-button rounded-[0.85rem] px-3 py-2 text-left text-sm font-semibold text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-950" locale={locale} />
+            <RechargeButton
+              className="side-nav-button flex w-full items-center gap-3 rounded-[0.85rem] border-0 bg-transparent px-3 py-2 text-left text-sm font-semibold text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-950"
+              icon={<LightningBoltIcon />}
+              locale={locale}
+            />
+            <InvitationButton
+              className="side-nav-button flex w-full items-center gap-3 rounded-[0.85rem] border-0 bg-transparent px-3 py-2 text-left text-sm font-semibold text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-950"
+              icon={<Link2Icon />}
+              label={t.navInvitations}
+              locale={locale}
+            />
           </nav>
           <div className="mt-4">
             <CreditBadge credits={credits} locale={locale} />
