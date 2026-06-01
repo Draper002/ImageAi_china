@@ -175,7 +175,7 @@ textarea {
   justify-content: flex-start;
   font-size: 0.875rem;
   font-weight: 600;
-  line-height: 1.25rem;
+  line-height: 1.4285714286;
 }
 
 .create-sidebar nav svg {

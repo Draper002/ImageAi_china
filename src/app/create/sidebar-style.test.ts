@@ -8,6 +8,6 @@ describe("create sidebar styles", () => {
 
     expect(css).toMatch(/\.create-sidebar \.side-nav-button\s*\{[^}]*font-size:\s*0\.875rem/s);
     expect(css).toMatch(/\.create-sidebar \.side-nav-button\s*\{[^}]*font-weight:\s*600/s);
-    expect(css).toMatch(/\.create-sidebar \.side-nav-button\s*\{[^}]*line-height:\s*1\.25rem/s);
+    expect(css).toMatch(/\.create-sidebar \.side-nav-button\s*\{[^}]*line-height:\s*1\.4285714286/s);
   });
 });
