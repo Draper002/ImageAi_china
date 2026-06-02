@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AccountMenu } from "@/components/account-menu";
 import { HistoryGrid } from "@/components/history-grid";
 import { LanguageSwitch } from "@/components/language-switch";
+import { TopNav } from "@/components/top-nav";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { requireUser } from "@/lib/auth";
@@ -36,7 +37,8 @@ export default async function HistoryPage() {
   const locale = profile?.locale === "en" ? "en" : "zh";
   const email = user.email ?? "未设置邮箱";
 
-  const items = await Promise.all((data ?? []).map(async (item) => {
+  const visibleData = (data ?? []).filter((item) => !("deleted_at" in item) || !item.deleted_at);
+  const items = await Promise.all(visibleData.map(async (item) => {
     const signed = item.generated_image_path
       ? await supabase.storage.from("generated-images").createSignedUrl(item.generated_image_path, 600)
       : { data: null };
@@ -71,6 +73,7 @@ function HistoryShell({
             <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-600">按时间倒序展示作品。这里不做表格，把每次生成都当成可复用的视觉资产。</p>
           </div>
           <div className="header-actions">
+            <TopNav locale={locale} />
             <LanguageSwitch locale={locale} path="/history" />
             <Button asChild variant="accent"><Link href="/create">继续生成</Link></Button>
           </div>

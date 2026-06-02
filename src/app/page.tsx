@@ -7,6 +7,7 @@ import {
   MixerHorizontalIcon
 } from "@radix-ui/react-icons";
 import { LanguageSwitch } from "@/components/language-switch";
+import { TopNav } from "@/components/top-nav";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Locale } from "@/lib/presets";
@@ -119,6 +120,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     <main id="main-content" className="shell overflow-hidden">
       <nav className="nav">
         <Link className="brand" href="/"><span className="logo">P</span>PromptCanvas</Link>
+        <TopNav locale={locale} />
         <div className="nav-actions">
           <LanguageSwitch locale={locale} path="/" />
           <Button asChild variant="secondary"><Link href={`/login?locale=${locale}`}>{t.login}</Link></Button>

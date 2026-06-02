@@ -6,6 +6,7 @@ import { CreateForm } from "@/components/create-form";
 import { InvitationButton } from "@/components/invitation-dialog";
 import { LanguageSwitch } from "@/components/language-switch";
 import { RechargeButton } from "@/components/recharge-dialog";
+import { TopNav } from "@/components/top-nav";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { requireUser } from "@/lib/auth";
@@ -130,6 +131,7 @@ export default async function CreatePage({ searchParams }: CreatePageProps) {
                 </p>
               </div>
               <div className="header-actions">
+                <TopNav locale={locale} />
                 <LanguageSwitch locale={locale} path="/create" />
                 <Button asChild variant="secondary"><Link href={`/history?locale=${locale}`}>{t.history}</Link></Button>
               </div>

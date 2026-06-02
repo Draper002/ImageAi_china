@@ -3,6 +3,7 @@ import { CheckCircledIcon, ClockIcon, DashboardIcon, ImageIcon } from "@radix-ui
 import { AccountMenu } from "@/components/account-menu";
 import { LanguageSwitch } from "@/components/language-switch";
 import { RechargeButton } from "@/components/recharge-dialog";
+import { TopNav } from "@/components/top-nav";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { requireUser } from "@/lib/auth";
@@ -80,6 +81,7 @@ function AccountDashboard({ stats }: { stats: AccountStats }) {
               <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-600">查看当前积分、生成状态和账户入口。积分可通过支付宝充值到账。</p>
             </div>
             <div className="header-actions">
+              <TopNav locale={stats.locale} />
               <LanguageSwitch locale={stats.locale} path="/account" />
               <Button asChild variant="secondary"><Link href="/history">作品库</Link></Button>
               <Button asChild variant="accent"><Link href="/create">创建图片</Link></Button>

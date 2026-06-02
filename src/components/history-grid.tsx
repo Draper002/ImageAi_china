@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { ImageIcon, MagicWandIcon } from "@radix-ui/react-icons";
+import { deleteGeneration, submitGenerationCase } from "@/app/history/actions";
+import { caseStatusLabel, type CaseSubmissionStatus } from "@/lib/cases";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 
@@ -10,6 +12,8 @@ type HistoryItem = {
   style: string | null;
   created_at: string;
   imageUrl: string | null;
+  status?: string;
+  case_submission_status?: CaseSubmissionStatus | null;
 };
 
 export function HistoryGrid({ items }: { items: HistoryItem[] }) {
@@ -50,6 +54,20 @@ export function HistoryGrid({ items }: { items: HistoryItem[] }) {
             <h2>{item.subject}</h2>
             <p>{item.style ?? "默认风格"}</p>
             <small>{new Date(item.created_at).toLocaleString("zh-CN")}</small>
+            <div className="history-card-actions">
+              {item.status === "succeeded" && (item.case_submission_status ?? "none") === "none" ? (
+                <form action={submitGenerationCase}>
+                  <input name="generationId" type="hidden" value={item.id} />
+                  <button className="history-action-button primary" type="submit">提交案例</button>
+                </form>
+              ) : item.case_submission_status && item.case_submission_status !== "none" ? (
+                <span className="history-case-status">{caseStatusLabel(item.case_submission_status)}</span>
+              ) : null}
+              <form action={deleteGeneration}>
+                <input name="generationId" type="hidden" value={item.id} />
+                <button className="history-action-button danger" type="submit">删除</button>
+              </form>
+            </div>
           </div>
         </article>
       ))}
